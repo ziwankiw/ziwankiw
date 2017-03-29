@@ -66,7 +66,20 @@ int main() {
         TRISBbits.TRISB8 = 0; //RD8 is digital output for USER LED
         LATBbits.LATB8 = 1; //set to HIGH initially, LED is on
         
-        while (PORTBbits.RB7 == 0) // if USER button is pushed
+         _CP0_SET_COUNT(0); // restart timer
+         
+        while (_CP0_GET_COUNT() < 12000) 
+            { ; } // wait 12000 ticks = 0.5 ms at 48/2 MHz
+         
+         LATBbits.LATB8 = 0; // after 0.5ms turn off LED
+         
+         _CP0_SET_COUNT(0); // restart timer
+         
+        while (_CP0_GET_COUNT() < 12000) 
+            { ; } // wait 12000 ticks = 0.5 ms at 48/2 MHz
+         
+        
+        while (PORTBbits.RB7 == 0) // while USER button is pushed
         {
             LATBbits.LATB8 = 0; //turn LED off
         }
