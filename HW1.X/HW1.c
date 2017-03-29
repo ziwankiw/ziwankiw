@@ -60,8 +60,18 @@ int main() {
     while(1) {
 	    // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
 		  // remember the core timer runs at half the CPU speed
-        TRISBbits.TRISB8 = 0;
-        LATBbits.LATB8 = 1;
+        
+        TRISBbits.TRISB7 = 1; //RD7 is digital input for USER button
+        
+        TRISBbits.TRISB8 = 0; //RD8 is digital output for USER LED
+        LATBbits.LATB8 = 1; //set to HIGH initially, LED is on
+        
+        while (PORTBbits.RB7 == 0) // if USER button is pushed
+        {
+            LATBbits.LATB8 = 0; //turn LED off
+        }
+        
+               
                 
     }
 }
