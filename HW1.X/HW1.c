@@ -61,17 +61,17 @@ int main() {
 	    // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
 		  // remember the core timer runs at half the CPU speed
         
-        TRISBbits.TRISB7 = 1; //RD7 is digital input for USER button
+        TRISBbits.TRISB4 = 1; //RB4 is digital input for USER button
         
-        TRISBbits.TRISB8 = 0; //RD8 is digital output for USER LED
-        LATBbits.LATB8 = 1; //set to HIGH initially, LED is on
+        TRISAbits.TRISA4 = 0; //RA4 is digital output for USER LED
+        LATAbits.LATA4 = 1; //set to HIGH initially, LED is on
         
          _CP0_SET_COUNT(0); // restart timer
          
         while (_CP0_GET_COUNT() < 12000) 
             { ; } // wait 12000 ticks = 0.5 ms at 48/2 MHz
          
-         LATBbits.LATB8 = 0; // after 0.5ms turn off LED
+         LATAbits.LATA4 = 0; // after 0.5ms turn off LED
          
          _CP0_SET_COUNT(0); // restart timer
          
@@ -79,9 +79,9 @@ int main() {
             { ; } // wait 12000 ticks = 0.5 ms at 48/2 MHz
          
         
-        while (PORTBbits.RB7 == 0) // while USER button is pushed
+        while (PORTBbits.RB4 == 0) // while USER button is pushed
         {
-            LATBbits.LATB8 = 0; //turn LED off
+            LATAbits.LATA4 = 0; //turn LED off
         }
         
                
