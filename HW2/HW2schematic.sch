@@ -13208,7 +13208,7 @@ This footprint was designed to help hold the alignment of a through-hole compone
 </classes>
 <parts>
 <part name="U$1" library="HW2library" deviceset="PIC32" device=""/>
-<part name="LED2" library="HW2library" deviceset="LED" device="3MM" value="Green"/>
+<part name="LED2" library="HW2library" deviceset="LED" device="3MM" value="USER"/>
 <part name="GND2" library="HW2library" deviceset="GND" device=""/>
 <part name="GND4" library="HW2library" deviceset="GND" device=""/>
 <part name="GND8" library="HW2library" deviceset="GND" device=""/>
@@ -13216,9 +13216,9 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <part name="C2" library="HW2library" deviceset="C-US" device="025-025X050" value="0.1uF"/>
 <part name="C3" library="HW2library" deviceset="C-US" device="025-025X050" value="0.1uF"/>
 <part name="GND10" library="HW2library" deviceset="GND" device=""/>
-<part name="LED1" library="HW2library" deviceset="LED" device="3MM" value="Red"/>
+<part name="LED1" library="HW2library" deviceset="LED" device="3MM" value="POWER"/>
 <part name="GND11" library="HW2library" deviceset="GND" device=""/>
-<part name="U$3" library="HW2library" deviceset="8MHZ_RESONATOR" device=""/>
+<part name="U$3" library="HW2library" deviceset="8MHZ_RESONATOR" device="" value="8MHZ_OSCILLATOR"/>
 <part name="GND12" library="HW2library" deviceset="GND" device=""/>
 <part name="GND1" library="HW2library" deviceset="GND" device=""/>
 <part name="GND13" library="HW2library" deviceset="GND" device=""/>
