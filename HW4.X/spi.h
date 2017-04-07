@@ -1,7 +1,9 @@
 #ifndef SPI_H
-#define SPI_h
+#define SPI_H
+
+#include <xc.h>
 
 void initSPI1();
-char SPI1_IO(char write);
+//char SPI1_IO(char write);
 
 #endif
