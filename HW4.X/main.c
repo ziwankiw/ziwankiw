@@ -60,9 +60,12 @@ __builtin_disable_interrupts();
     
     while(1)
     {  
-        
+        //setVoltage(0b1,0b11101111);
         LATBbits.LATB7 = 0; //CS pin low -> begin data transmission
-        SPI1BUF = 0b111110001100000;   
+        SPI1BUF = 0b0111001111110000;
+        while(!SPI1STATbits.SPIRBF) {;}
+        SPI1BUF;
+        SPI1BUF = 0b1111111111110000;
         while(!SPI1STATbits.SPIRBF) {;}
         SPI1BUF;
         LATBbits.LATB7 = 1; //CS pin high -> end data transmission
@@ -70,9 +73,7 @@ __builtin_disable_interrupts();
         
         _CP0_SET_COUNT(0);
         while (_CP0_GET_COUNT() < 24000) 
-            { ; } // wait 24000 ticks = 1 ms at 48/2 MHz
-        
-        
+            { ; } // wait 24000 ticks = 1 ms at 48/2 MHz       
         
     }
     
