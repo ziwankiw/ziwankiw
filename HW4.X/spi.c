@@ -27,7 +27,8 @@ void makeSineWave() {
     int i=0;
     for(i=0; i<1000; ++i)
     {
-        sinewave[i]=128+127*sin(PI*i/100);
+        sinewave[i]=128+127*sin(2*PI*i/100); // each i is 1ms
+                                             // frequency 10Hz
     }
 }
 
@@ -35,7 +36,7 @@ void makeTriangleWave() {
     int i=0;
     for(i=0; i<1000; ++i)
     {
-        triwave[i] = ((unsigned char) (1.275*i)) %255;    
+        triwave[i] = ((unsigned char) (1.275*i)) %255; // frequency 5Hz
     }
 }
 
