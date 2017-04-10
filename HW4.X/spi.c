@@ -4,7 +4,7 @@ void initSPI1() {
     
     SPI1CON = 0;
     SPI1BUF;
-    SPI1BRG = 239; // 23  -> baud rate to 1MHz
+    SPI1BRG = 23; // 23  -> baud rate to 1MHz
                   // 239 -> baud 100kHz for debugging
     SPI1STATbits.SPIROV = 0;
     SPI1CONbits.MODE32 = 0;
@@ -27,8 +27,7 @@ void makeSineWave() {
     int i=0;
     for(i=0; i<1000; ++i)
     {
-        float val = i/100;
-        sinewave[i]=128+127*sin(PI*val);
+        sinewave[i]=128+127*sin(PI*i/100);
     }
 }
 

@@ -61,7 +61,7 @@ __builtin_disable_interrupts();
         //setVoltage(1,199);
         int i = 0;
         for (i=0;i<1000;++i){
-            //setVoltage(0,sinewave[i]);
+            setVoltage(0,sinewave[i]);
             setVoltage(1,triwave[i]);
             
             _CP0_SET_COUNT(0);
