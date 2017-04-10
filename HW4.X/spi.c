@@ -4,10 +4,11 @@ void initSPI1() {
     
     SPI1CON = 0;
     SPI1BUF;
-    SPI1BRG = 23; // baud rate to 1MHz
+    SPI1BRG = 239; // 23  -> baud rate to 1MHz
+                  // 239 -> baud 100kHz for debugging
     SPI1STATbits.SPIROV = 0;
     SPI1CONbits.MODE32 = 0;
-    SPI1CONbits.MODE16 = 1;
+    SPI1CONbits.MODE16 = 0;
     SPI1CONbits.MSTEN = 1;
     SPI1CONbits.ON = 1;
     
@@ -26,7 +27,7 @@ void makeSineWave() {
     int i=0;
     for(i=0; i<1000; ++i)
     {
-        int val = i/100;
+        float val = i/100;
         sinewave[i]=128+127*sin(PI*val);
     }
 }
@@ -35,30 +36,40 @@ void makeTriangleWave() {
     int i=0;
     for(i=0; i<1000; ++i)
     {
-        triwave[i] = ((char) (1.275*i)) %255;    
+        triwave[i] = ((unsigned char) (1.275*i)) %255;    
     }
 }
 
-void setVoltage(char channel, char voltage)
+void setVoltage(unsigned char channel, unsigned char voltage)
 {
-    int channelbit = channel << 15;
-    int configbits = 0b111000000000000;
-    int voltagebits = voltage << 4;
+    unsigned char byte1 = 0;
+    unsigned char byte2 = 0;
     
-    int msg16 = channelbit | configbits | voltagebits;
+    if(channel == 0){
+        byte1 = 0b01110000;
+    }
+    else {
+        byte1 = 0b11110000; 
+    }
     
-    SPI1_IO(msg16);
+    unsigned char vbyte1 = voltage >> 4;
+    byte1 = byte1|vbyte1;
+    
+    byte2 = voltage<<4;
+    
+    CS = 0; //CS pin low -> begin data transmission
+    SPI1_IO(byte1);
+    SPI1_IO(byte2);
+    CS = 1; //CS pin high -> end data transmission
     
     
 }
 
-char SPI1_IO(char write)
+char SPI1_IO(unsigned char write)
 {
-        CS = 0; //CS pin low -> begin data transmission
-        SPI1BUF = write;   
-        while(!SPI1STATbits.SPIRBF) {;}
-        SPI1BUF;
-        CS = 1; //CS pin high -> end data transmission
         
-    return 0;
+        SPI1BUF = write;   
+        while(!SPI1STATbits.SPIRBF) {;}        
+        
+    return SPI1BUF;
 }
