@@ -65,7 +65,7 @@ __builtin_disable_interrupts();
             setVoltage(1,triwave[i]);
             
             _CP0_SET_COUNT(0);
-            while (_CP0_GET_COUNT() < 23000) 
+            while (_CP0_GET_COUNT() < 24000) 
             { ; } // wait 24000 ticks = 1 ms at 48/2 MHz 
         }
         /*

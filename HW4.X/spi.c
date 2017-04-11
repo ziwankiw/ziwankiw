@@ -4,7 +4,7 @@ void initSPI1() {
     
     SPI1CON = 0;
     SPI1BUF;
-    SPI1BRG = 23; // 23  -> baud rate to 1MHz
+    SPI1BRG = 1; // 1  -> baud rate to 12MHz
                   // 239 -> baud 100kHz for debugging
     SPI1STATbits.SPIROV = 0;
     SPI1CONbits.MODE32 = 0;
