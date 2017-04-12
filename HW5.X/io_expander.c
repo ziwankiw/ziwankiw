@@ -14,7 +14,7 @@ void initExpander(void) {
     i2c_master_start();
     i2c_master_send(ADDR<<1 | 0);
     i2c_master_send(0x05); //IOCON register is 0x05
-    i2c_master_send(0b00010100); //1 is input, 0 is output
+    i2c_master_send(0b00010100);
     i2c_master_stop();
     
     // enable pull-up resistors on input pins
@@ -31,4 +31,17 @@ void setExpander(char pin, char level){
     i2c_master_send(0x09); // GPIO register is 0x09
     i2c_master_send(level<<pin); //level of 1 sets output to high
     i2c_master_stop();
+}
+
+unsigned char getExpander() {
+    i2c_master_start();
+    i2c_master_send(ADDR<<1 | 0);
+    i2c_master_send(0x09); // GPIO register is 0x09
+    i2c_master_restart();
+    i2c_master_send(ADDR<<1 | 1);
+    unsigned char byte = i2c_master_recv();
+    i2c_master_ack(1);
+    i2c_master_stop();
+    
+    return byte;
 }

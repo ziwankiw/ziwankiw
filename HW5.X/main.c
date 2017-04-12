@@ -64,6 +64,11 @@ __builtin_disable_interrupts();
     while(1)
     {  
         setExpander(0,1);
+
+        while(getExpander()>>7 == 0) {
+        setExpander(0,0);
+        }
+    
     }
     
     return 0;
