@@ -1,6 +1,9 @@
-#include <xc.h>
+#include <xc.h>           // processor SFR definitions
 #include "i2c_master_noint.h"
 #include "io_expander.h"
+
+
+#define ADDR 0b0100111
 
 // DEVCFG0
 #pragma config DEBUG = OFF // no debugging
@@ -52,10 +55,16 @@ __builtin_disable_interrupts();
 
     // disable JTAG to get pins back
     DDPCONbits.JTAGEN = 0;
-    
+
     i2c_master_setup();
     initExpander();
-
     __builtin_enable_interrupts();
+      
     
+    while(1)
+    {  
+        setExpander(0,1);
+    }
+    
+    return 0;
 }

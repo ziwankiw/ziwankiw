@@ -1,3 +1,4 @@
+#include "i2c_master_noint.h"
 // I2C Master utilities, 100 kHz, using polling rather than interrupts
 // The functions must be callled in the correct order as per the I2C protocol
 // Change I2C1 to the I2C channel you are using
@@ -5,7 +6,7 @@
 
 void i2c_master_setup(void) {
   I2C2BRG = 233;     //100kHz       // I2CBRG = [1/(2*Fsck) - PGD]*Pblck - 2 
-  ANSELBbits.ANSB2 = 0;             //turn off analog pins to enable 
+  ANSELBbits.ANSB2 = 0;             //turn off analog pins to enable i2c functions
   ANSELBbits.ANSB3 = 0;             
   I2C2CONbits.ON = 1;               // turn on the I2C2 module
 }
