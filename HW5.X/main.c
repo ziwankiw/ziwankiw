@@ -63,10 +63,10 @@ __builtin_disable_interrupts();
     
     while(1)
     {  
-        setExpander(0,1);
+        setExpander(0,0); //LED is off by default
 
-        while(getExpander()>>7 == 0) {
-        setExpander(0,0);
+        while(getExpander()>>7 == 0) { //if button is pushed
+        setExpander(0,1); //turn on LED
         }
     
     }
