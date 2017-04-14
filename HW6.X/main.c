@@ -1,5 +1,6 @@
 #include <xc.h>
 #include "ili9163c.h"
+#include <stdio.h>
 
 // DEVCFG0
 #pragma config DEBUG = OFF // no debugging
@@ -65,6 +66,10 @@ int main() {
         LCD_drawCharacter(z,100,100,BLUE,YELLOW);
         LCD_drawCharacter(e,105,105,BLUE,YELLOW);
         LCD_drawCharacter(n,110,110,BLUE,YELLOW);
+        
+        char msg[100];
+        sprintf(msg,"HELLO WORLD!");
+        LCD_drawString(msg,20,20,RED,CYAN);
         
     }
     return 0;

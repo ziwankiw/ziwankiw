@@ -191,8 +191,8 @@ void LCD_clearScreen(unsigned short color) {
 		}
 }
 
-void LCD_drawCharacter(char c, unsigned short x, unsigned short y, unsigned short textCol, unsigned short backCol) 
-{   
+void LCD_drawCharacter(char c, unsigned short x, unsigned short y, unsigned short textCol, unsigned short backCol) {
+  
 char d = c - 0x20;
     int i; int j;
     for(i=0;i<=4;i++){
@@ -208,5 +208,13 @@ char d = c - 0x20;
                 }
             }
         }
+    }
+}
+
+void LCD_drawString(char *msg, unsigned short x, unsigned short y, unsigned short textCol, unsigned short backCol) {
+    char charIndex = 0;
+    while (msg[charIndex] != 0) {
+        LCD_drawCharacter(msg[charIndex], x+charIndex*5, y, textCol, backCol);
+        charIndex++;
     }
 }
