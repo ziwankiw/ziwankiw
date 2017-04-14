@@ -38,6 +38,7 @@
 #pragma config FVBUSONIO = ON // USB BUSON controlled by USB module
 
 int main() {
+#define BACKGROUND WHITE
     __builtin_disable_interrupts();
 
     // set the CP0 CONFIG register to indicate that kseg0 is cacheable (0x3)
@@ -60,17 +61,27 @@ int main() {
     
     while(1) {
         
+        
         char z = 90;
         char e = 69;
         char n = 78;
         LCD_drawCharacter(z,100,100,BLUE,YELLOW);
-        LCD_drawCharacter(e,105,105,BLUE,YELLOW);
-        LCD_drawCharacter(n,110,110,BLUE,YELLOW);
+        LCD_drawCharacter(e,106,105,BLUE,YELLOW);
+        LCD_drawCharacter(n,112,110,BLUE,YELLOW);
         
         char msg[100];
-        sprintf(msg,"HELLO WORLD!");
-        LCD_drawString(msg,20,20,RED,CYAN);
         
+        int i;
+        for(i=-50; i<=50; i++) {
+           sprintf(msg,"Hello world %d!   ",i);
+           LCD_drawString(msg,28,32,RED,BACKGROUND); 
+           
+           LCD_drawBar(64,i,50,4,BLUE,BACKGROUND);
+           _CP0_SET_COUNT(0);
+           while(_CP0_GET_COUNT()<1200000){;}
+        }
+        
+       
     }
     return 0;
 }

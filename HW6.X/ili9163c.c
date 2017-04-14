@@ -184,7 +184,15 @@ void LCD_setAddr(unsigned short x0, unsigned short y0, unsigned short x1, unsign
 }
 
 void LCD_clearScreen(unsigned short color) {
+    LCD_command(CMD_MADCTL); // rotation
+    LCD_data(0b01101000); // bit 3 0 for RGB, 1 for GBR, rotation: 0b00001000, 0b01101000, 0b11001000, 0b10101000
     int i;
+    LCD_setAddr(0,0,_GRAMWIDTH,_GRAMHEIGH);
+		for (i = 0;i < _GRAMSIZE; i++){
+			LCD_data16(color);
+		}
+    LCD_command(CMD_MADCTL); // rotation
+    LCD_data(0b10101000); // bit 3 0 for RGB, 1 for GBR, rotation: 0b00001000, 0b01101000, 0b11001000, 0b10101000
     LCD_setAddr(0,0,_GRAMWIDTH,_GRAMHEIGH);
 		for (i = 0;i < _GRAMSIZE; i++){
 			LCD_data16(color);
@@ -214,7 +222,32 @@ char d = c - 0x20;
 void LCD_drawString(char *msg, unsigned short x, unsigned short y, unsigned short textCol, unsigned short backCol) {
     char charIndex = 0;
     while (msg[charIndex] != 0) {
-        LCD_drawCharacter(msg[charIndex], x+charIndex*5, y, textCol, backCol);
+        LCD_drawCharacter(msg[charIndex], x+charIndex*6, y, textCol, backCol);
         charIndex++;
+    }
+}
+
+void LCD_drawBar(unsigned short xmid, short val, unsigned short y, unsigned short height, unsigned short barColor, unsigned short backColor) {
+    unsigned short xstart;
+    unsigned short xend;
+    if (val < 0){ // negative number
+        xstart = xmid+val;
+        xend = xmid;
+    }
+    else {
+        xstart = xmid;
+        xend = xmid+val;
+    }
+    int i; int j;
+    for (i = xmid-50; i<=xmid+50; i++){
+        for (j=y; j<=y+height; j++){
+            if(i > xstart && i < xend) {
+                LCD_drawPixel(i,j,barColor);
+            }
+            else {
+                LCD_drawPixel(i,j,backColor);
+            }
+                
+        }
     }
 }
