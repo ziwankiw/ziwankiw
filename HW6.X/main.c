@@ -1,4 +1,5 @@
 #include <xc.h>
+#include "ili9163c.h"
 
 // DEVCFG0
 #pragma config DEBUG = OFF // no debugging
@@ -51,7 +52,20 @@ int main() {
     DDPCONbits.JTAGEN = 0;
 
     SPI1_init();
+    LCD_init();
+    LCD_clearScreen(WHITE);
     __builtin_enable_interrupts();
     
+    
+    while(1) {
+        
+        char z = 90;
+        char e = 69;
+        char n = 78;
+        LCD_drawCharacter(z,100,100,BLUE,YELLOW);
+        LCD_drawCharacter(e,105,105,BLUE,YELLOW);
+        LCD_drawCharacter(n,110,110,BLUE,YELLOW);
+        
+    }
     return 0;
 }
