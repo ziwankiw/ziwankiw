@@ -38,7 +38,7 @@
 #pragma config FVBUSONIO = ON // USB BUSON controlled by USB module
 
 int main() {
-#define BACKGROUND WHITE
+#define BACKGROUND MAGENTA
     __builtin_disable_interrupts();
 
     // set the CP0 CONFIG register to indicate that kseg0 is cacheable (0x3)
@@ -55,33 +55,30 @@ int main() {
 
     SPI1_init();
     LCD_init();
-    LCD_clearScreen(WHITE);
+    LCD_clearScreen(BACKGROUND);
     __builtin_enable_interrupts();
     
+    char msg[100];
+    float fps;
+    int i;
     
     while(1) {
+
         
         
-        char z = 90;
-        char e = 69;
-        char n = 78;
-        LCD_drawCharacter(z,100,100,BLUE,YELLOW);
-        LCD_drawCharacter(e,106,105,BLUE,YELLOW);
-        LCD_drawCharacter(n,112,110,BLUE,YELLOW);
-        
-        char msg[100];
-        
-        int i;
         for(i=-50; i<=50; i++) {
+            _CP0_SET_COUNT(0);
            sprintf(msg,"Hello world %d!   ",i);
-           LCD_drawString(msg,28,32,RED,BACKGROUND); 
+           LCD_drawString(msg,28,32,YELLOW,BACKGROUND); 
+           LCD_drawBar(64,i,50,3,GREEN,BACKGROUND);
            
-           LCD_drawBar(64,i,50,4,BLUE,BACKGROUND);
-           _CP0_SET_COUNT(0);
-           while(_CP0_GET_COUNT()<1200000){;}
+           fps = 24000000.0 / _CP0_GET_COUNT();
+        
+        sprintf(msg,"FPS = %.2f",fps);
+        LCD_drawString(msg,35,70,YELLOW,BACKGROUND); 
         }
         
-       
+              
     }
     return 0;
 }

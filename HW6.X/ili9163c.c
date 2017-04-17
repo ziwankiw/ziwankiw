@@ -222,7 +222,7 @@ char d = c - 0x20;
 void LCD_drawString(char *msg, unsigned short x, unsigned short y, unsigned short textCol, unsigned short backCol) {
     char charIndex = 0;
     while (msg[charIndex] != 0) {
-        LCD_drawCharacter(msg[charIndex], x+charIndex*6, y, textCol, backCol);
+        LCD_drawCharacter(msg[charIndex], x+charIndex*5, y, textCol, backCol);
         charIndex++;
     }
 }
