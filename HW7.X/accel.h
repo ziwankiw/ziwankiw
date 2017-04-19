@@ -3,4 +3,8 @@
 
 #include <xc.h>
 
+#define ADDR 0b1101011
+
+void initAccel(void);
+
 #endif
