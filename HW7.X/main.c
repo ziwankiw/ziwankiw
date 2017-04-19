@@ -64,8 +64,10 @@ __builtin_disable_interrupts();
     initAccel();
     __builtin_enable_interrupts();
       
+    int length = 14;
     char msg[100];
     char whoami;
+    unsigned char data[length];
     
     while(1)
     {

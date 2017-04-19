@@ -18,3 +18,28 @@ void initAccel(void) {
     i2c_master_send(0b10001000);
     i2c_master_stop();
 }
+
+void I2C_read_multiple(unsigned char address, unsigned char startreg, unsigned char *data, int length) {
+    // for accelerometer, address = 0b1101011, startreg = 0x20, length = 14
+    i2c_master_start();
+    i2c_master_send(ADDR<<1 | 0);
+    i2c_master_send(startreg);
+    i2c_master_restart();
+    i2c_master_send(ADDR<<1 | 1);
+    
+    int i;
+    for(i=1; i<=length; i++) {
+        data[i] = i2c_master_recv();
+        
+        if(i<length){
+            i2c_master_ack(0);
+        }
+        else {
+            i2c_master_ack(1);
+        }
+        
+        
+    }
+    
+    i2c_master_stop();
+}
