@@ -76,10 +76,10 @@ __builtin_disable_interrupts();
         reconstructShort(bytes, data, length);
         
         sprintf(msg,"X accel = %d   ", data[5]);
-        LCD_drawString(msg,28,32,BLACK,BACKGROUND); 
+        LCD_drawString(msg,1,1,BLACK,BACKGROUND); 
         
         sprintf(msg,"Y accel = %d   ", data[6]);
-        LCD_drawString(msg,28,50,BLACK,BACKGROUND);
+        LCD_drawString(msg,1,10,BLACK,BACKGROUND);
         
     }
     
