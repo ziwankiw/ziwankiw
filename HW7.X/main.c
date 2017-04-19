@@ -56,7 +56,7 @@ __builtin_disable_interrupts();
     // disable JTAG to get pins back
     DDPCONbits.JTAGEN = 0;
 
-#define BACKGROUND WHITE
+#define BACKGROUND BLACK
     i2c_master_setup();
     SPI1_init();
     LCD_init();
@@ -75,8 +75,8 @@ __builtin_disable_interrupts();
         I2C_read_multiple(ADDR, 0x20, bytes, length);
         reconstructShort(bytes, data, length);
 
-        LCD_drawBarX(64, data[5]/256, 63, 3, BLUE, BACKGROUND);
-        LCD_drawBarY(64, data[6]/256, 63, 3, RED, BACKGROUND);
+        LCD_drawBarX(64, data[5]/256, 63, 3, YELLOW, BACKGROUND);
+        LCD_drawBarY(64, data[6]/256, 63, 3, CYAN, BACKGROUND);
         
     }
     
