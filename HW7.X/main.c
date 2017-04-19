@@ -74,12 +74,9 @@ __builtin_disable_interrupts();
     {
         I2C_read_multiple(ADDR, 0x20, bytes, length);
         reconstructShort(bytes, data, length);
-        
-        sprintf(msg,"X accel = %d   ", data[5]);
-        LCD_drawString(msg,1,1,BLACK,BACKGROUND); 
-        
-        sprintf(msg,"Y accel = %d   ", data[6]);
-        LCD_drawString(msg,1,10,BLACK,BACKGROUND);
+
+        LCD_drawBarX(64, data[5]/256, 63, 3, BLUE, BACKGROUND);
+        LCD_drawBarY(64, data[6]/256, 63, 3, RED, BACKGROUND);
         
     }
     

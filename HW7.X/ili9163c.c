@@ -192,7 +192,7 @@ void LCD_clearScreen(unsigned short color) {
 			LCD_data16(color);
 		}
     LCD_command(CMD_MADCTL); // rotation
-    LCD_data(0b11001000); // bit 3 0 for RGB, 1 for GBR, rotation: 0b00001000, 0b01101000, 0b11001000, 0b10101000
+    LCD_data(0b00001000); // bit 3 0 for RGB, 1 for GBR, rotation: 0b00001000, 0b01101000, 0b11001000, 0b10101000
     LCD_setAddr(0,0,_GRAMWIDTH,_GRAMHEIGH);
 		for (i = 0;i < _GRAMSIZE; i++){
 			LCD_data16(color);
@@ -227,7 +227,7 @@ void LCD_drawString(char *msg, unsigned short x, unsigned short y, unsigned shor
     }
 }
 
-void LCD_drawBar(unsigned short xmid, short val, unsigned short y, unsigned short height, unsigned short barColor, unsigned short backColor) {
+void LCD_drawBarX(unsigned short xmid, short val, unsigned short y, unsigned short height, unsigned short barColor, unsigned short backColor) {
     unsigned short xstart;
     unsigned short xend;
     if (val < 0){ // negative number
@@ -239,13 +239,38 @@ void LCD_drawBar(unsigned short xmid, short val, unsigned short y, unsigned shor
         xend = xmid+val;
     }
     int i; int j;
-    for (i = xmid-50; i<=xmid+50; i++){
+    for (i = xmid-64; i<=xmid+64; i++){
         for (j=y; j<=y+height; j++){
             if(i > xstart && i < xend) {
                 LCD_drawPixel(i,j,barColor);
             }
             else {
                 LCD_drawPixel(i,j,backColor);
+            }
+                
+        }
+    }
+}
+
+void LCD_drawBarY(unsigned short ymid, short val, unsigned short x, unsigned short width, unsigned short barColor, unsigned short backColor) {
+    unsigned short ystart;
+    unsigned short yend;
+    if (val < 0){ // negative number
+        ystart = ymid+val;
+        yend = ymid;
+    }
+    else {
+        ystart = ymid;
+        yend = ymid+val;
+    }
+    int i; int j;
+    for (i = ymid-64; i<=ymid+64; i++){
+        for (j=x; j<=x+width; j++){
+            if(i > ystart && i < yend) {
+                LCD_drawPixel(j,i,barColor);
+            }
+            else {
+                LCD_drawPixel(j,i,backColor);
             }
                 
         }
