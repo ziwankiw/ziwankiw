@@ -7,6 +7,7 @@
 #define ADDR 0b1101011
 
 void initAccel(void);
-void I2C_read_multiple(unsigned char address, unsigned char register, unsigned char *data, int length);
+void I2C_read_multiple(unsigned char address, unsigned char startreg, unsigned char *bytes, int length);
+void reconstructShort(unsigned char *bytes, short *data, int length);
 
 #endif

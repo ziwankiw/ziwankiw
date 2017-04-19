@@ -19,17 +19,17 @@ void initAccel(void) {
     i2c_master_stop();
 }
 
-void I2C_read_multiple(unsigned char address, unsigned char startreg, unsigned char *data, int length) {
+void I2C_read_multiple(unsigned char address, unsigned char startreg, unsigned char *bytes, int length) {
     // for accelerometer, address = 0b1101011, startreg = 0x20, length = 14
     i2c_master_start();
-    i2c_master_send(ADDR<<1 | 0);
+    i2c_master_send(address<<1 | 0);
     i2c_master_send(startreg);
     i2c_master_restart();
-    i2c_master_send(ADDR<<1 | 1);
+    i2c_master_send(address<<1 | 1);
     
     int i;
     for(i=1; i<=length; i++) {
-        data[i] = i2c_master_recv();
+        bytes[i] = i2c_master_recv();
         
         if(i<length){
             i2c_master_ack(0);
@@ -42,4 +42,12 @@ void I2C_read_multiple(unsigned char address, unsigned char startreg, unsigned c
     }
     
     i2c_master_stop();
+}
+
+void reconstructShort(unsigned char *bytes, short *data, int length) {
+    
+    int i;
+    for(i=1; i<=length/2; i++) {
+        data[i] = (bytes[i*2] << 8 | bytes[i*2 - 1]);
+    }
 }

@@ -67,23 +67,31 @@ __builtin_disable_interrupts();
     int length = 14;
     char msg[100];
     char whoami;
-    unsigned char data[length];
+    unsigned char bytes[length];
+    short data[length/2];
     
     while(1)
     {
-        i2c_master_start();
-        i2c_master_send(ADDR<<1 | 0);
-        i2c_master_send(0x0F);
-        i2c_master_restart();
-        i2c_master_send(ADDR<<1 | 1); //or'ed with 1 to indicate reading
-        whoami = i2c_master_recv();
-        i2c_master_ack(1);
-        i2c_master_stop();
+        I2C_read_multiple(ADDR, 0x20, bytes, length);
+        reconstructShort(bytes, data, length);
         
-        sprintf(msg,"WHO AM I %d   ",whoami);
+        sprintf(msg,"X accel = %d   ", data[5]);
         LCD_drawString(msg,28,32,BLACK,BACKGROUND); 
+        
+        sprintf(msg,"Y accel = %d   ", data[6]);
+        LCD_drawString(msg,28,50,BLACK,BACKGROUND);
         
     }
     
     return 0;
 }
+
+/* read register order:
+ * 1 temp
+ * 2 gyro X
+ * 3 gyro Y
+ * 4 gyro Z
+ * 5 accl X
+ * 6 accl Y
+ * 7 accl Z
+ */

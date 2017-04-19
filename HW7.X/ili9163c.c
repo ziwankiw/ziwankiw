@@ -156,7 +156,7 @@ void LCD_init() {
 	LCD_data16(0);
 
 	LCD_command(CMD_MADCTL); // rotation
-    LCD_data(0b10101000); // bit 3 0 for RGB, 1 for GBR, rotation: 0b00001000, 0b01101000, 0b11001000, 0b10101000
+    LCD_data(0b00001000); // bit 3 0 for RGB, 1 for GBR, rotation: 0b00001000, 0b01101000, 0b11001000, 0b10101000
 
 	LCD_command(CMD_DISPON);//display ON
 	time = _CP0_GET_COUNT();
@@ -192,7 +192,7 @@ void LCD_clearScreen(unsigned short color) {
 			LCD_data16(color);
 		}
     LCD_command(CMD_MADCTL); // rotation
-    LCD_data(0b10101000); // bit 3 0 for RGB, 1 for GBR, rotation: 0b00001000, 0b01101000, 0b11001000, 0b10101000
+    LCD_data(0b11001000); // bit 3 0 for RGB, 1 for GBR, rotation: 0b00001000, 0b01101000, 0b11001000, 0b10101000
     LCD_setAddr(0,0,_GRAMWIDTH,_GRAMHEIGH);
 		for (i = 0;i < _GRAMSIZE; i++){
 			LCD_data16(color);
