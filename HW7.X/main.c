@@ -1,6 +1,8 @@
 #include <xc.h>           // processor SFR definitions
+#include <stdio.h>
 #include "i2c_master_noint.h"
 #include "accel.h"
+#include "ili9163c.h"
 
 
 // DEVCFG0
@@ -54,14 +56,31 @@ __builtin_disable_interrupts();
     // disable JTAG to get pins back
     DDPCONbits.JTAGEN = 0;
 
+#define BACKGROUND WHITE
     i2c_master_setup();
+    SPI1_init();
+    LCD_init();
+    LCD_clearScreen(BACKGROUND);
     initAccel();
     __builtin_enable_interrupts();
       
+    char msg[100];
+    char whoami;
     
     while(1)
     {
-        ;
+        i2c_master_start();
+        i2c_master_send(ADDR<<1 | 0);
+        i2c_master_send(0x0F);
+        i2c_master_restart();
+        i2c_master_send(ADDR<<1 | 1); //or'ed with 1 to indicate reading
+        whoami = i2c_master_recv();
+        i2c_master_ack(1);
+        i2c_master_stop();
+        
+        sprintf(msg,"WHO AM I %d   ",whoami);
+        LCD_drawString(msg,28,32,BLACK,BACKGROUND); 
+        
     }
     
     return 0;
