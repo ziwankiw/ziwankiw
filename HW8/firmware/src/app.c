@@ -54,6 +54,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 
 #include "app.h"
+#include "accel.h"
+#include "i2c_master_noint.h"
+#include "ili9163c.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -117,10 +120,14 @@ void APP_Initialize ( void )
     /* Place the App state machine in its initial state. */
     appData.state = APP_STATE_INIT;
     
-TRISBbits.TRISB4 = 1; //RB4 is digital input for USER button
-        
-        TRISAbits.TRISA4 = 0; //RA4 is digital output for USER LED
-        LATAbits.LATA4 = 1; //set to HIGH initially, LED is on
+    #define BACKGROUND BLACK
+    i2c_master_setup();
+    SPI1_init();
+    LCD_init();
+    LCD_clearScreen(BACKGROUND);
+    initAccel();
+    
+    
     
     /* TODO: Initialize your application's state machine and other
      * parameters.
@@ -158,24 +165,18 @@ void APP_Tasks ( void )
 
         case APP_STATE_SERVICE_TASKS:
         {
-             LATAbits.LATA4 = 1; //set to HIGH initially, LED is on
-         _CP0_SET_COUNT(0); // restart timer
-         
-        while (_CP0_GET_COUNT() < 12000) 
-            { ; } // wait 12000 ticks = 0.5 ms at 48/2 MHz
-         
-         LATAbits.LATA4 = 0; // after 0.5ms turn off LED
-         
-         _CP0_SET_COUNT(0); // restart timer
-         
-        while (_CP0_GET_COUNT() < 12000) 
-            { ; } // wait 12000 ticks = 0.5 ms at 48/2 MHz
-         
         
-        while (PORTBbits.RB4 == 0) // while USER button is pushed
-        {
-            LATAbits.LATA4 = 0; //turn LED off
-        }
+            int length = 14;
+            char msg[100];
+            unsigned char bytes[length];
+            short data[length/2];
+            
+        I2C_read_multiple(ADDR, 0x20, bytes, length);
+        reconstructShort(bytes, data, length);
+
+        LCD_drawBarX(64, data[5]/256, 63, 3, YELLOW, BACKGROUND);
+        LCD_drawBarY(64, data[6]/256, 63, 3, CYAN, BACKGROUND);
+         
             break;
         }
 
