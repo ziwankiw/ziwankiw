@@ -419,7 +419,7 @@ void APP_Tasks(void) {
             /* Check if a character was received or a switch was pressed.
              * The isReadComplete flag gets updated in the CDC event handler. */
 
-            if (appData.isReadComplete || _CP0_GET_COUNT() - startTime > (48000000 / 2 / 5)) {
+            if (appData.isReadComplete || _CP0_GET_COUNT() - startTime > (48000000 / 2 / 100)) {
                 appData.state = APP_STATE_SCHEDULE_WRITE;
             }
 
@@ -439,12 +439,18 @@ void APP_Tasks(void) {
             appData.state = APP_STATE_WAIT_FOR_WRITE_COMPLETE;
 
 
-
             I2C_read_multiple(ADDR, 0x20, bytes, length);
             reconstructShort(bytes, data, length);
 
             len = sprintf(dataOut, "%d %d %d %d %d %d %d\r\n", i, data[5], data[6], data[7], data[2], data[3], data[4]);
-
+            
+            if (i >= 99){
+                i = 0;
+            } else {
+                i++;
+            }
+            
+            
             /* read register order:
              * 1 temp
              * 2 gyro X
@@ -454,7 +460,8 @@ void APP_Tasks(void) {
              * 6 accl Y
              * 7 accl Z
              */
-            i++;
+
+
             if (appData.isReadComplete) {
                 USB_DEVICE_CDC_Write(USB_DEVICE_CDC_INDEX_0,
                         &appData.writeTransferHandle,
