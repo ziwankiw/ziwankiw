@@ -49,6 +49,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 
 #include "app.h"
+#include "accel.h"
+#include "i2c_master_noint.h"
 #include <stdio.h>
 #include <xc.h>
 
@@ -331,6 +333,9 @@ void APP_Initialize(void) {
     /* Set up the read buffer */
     appData.readBuffer = &readBuffer[0];
 
+    i2c_master_setup();
+    initAccel();
+
     startTime = _CP0_GET_COUNT();
 }
 
@@ -344,6 +349,12 @@ void APP_Initialize(void) {
 void APP_Tasks(void) {
     /* Update the application state machine based
      * on the current state */
+
+    int length = 14;
+    char msg[100];
+    unsigned char bytes[length];
+    short data[length / 2];
+
 
     switch (appData.state) {
         case APP_STATE_INIT:
@@ -427,7 +438,22 @@ void APP_Tasks(void) {
             appData.isWriteComplete = false;
             appData.state = APP_STATE_WAIT_FOR_WRITE_COMPLETE;
 
-            len = sprintf(dataOut, "%d\r\n", i);
+
+
+            I2C_read_multiple(ADDR, 0x20, bytes, length);
+            reconstructShort(bytes, data, length);
+
+            len = sprintf(dataOut, "%d %d %d %d %d %d %d\r\n", i, data[5], data[6], data[7], data[2], data[3], data[4]);
+
+            /* read register order:
+             * 1 temp
+             * 2 gyro X
+             * 3 gyro Y
+             * 4 gyro Z
+             * 5 accl X
+             * 6 accl Y
+             * 7 accl Z
+             */
             i++;
             if (appData.isReadComplete) {
                 USB_DEVICE_CDC_Write(USB_DEVICE_CDC_INDEX_0,
