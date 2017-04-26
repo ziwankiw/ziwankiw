@@ -438,19 +438,31 @@ void APP_Tasks(void) {
             appData.isWriteComplete = false;
             appData.state = APP_STATE_WAIT_FOR_WRITE_COMPLETE;
 
+            if (appData.readBuffer[0] == 0x72) { // ascii r
 
-            I2C_read_multiple(ADDR, 0x20, bytes, length);
-            reconstructShort(bytes, data, length);
 
-            len = sprintf(dataOut, "%d %d %d %d %d %d %d\r\n", i, data[5], data[6], data[7], data[2], data[3], data[4]);
-            
-            if (i >= 99){
-                i = 0;
+                I2C_read_multiple(ADDR, 0x20, bytes, length);
+                reconstructShort(bytes, data, length);
+
+                len = sprintf(dataOut, "%d %d %d %d %d %d %d\r\n", i, data[5], data[6], data[7], data[2], data[3], data[4]);
+
+                if (i > 100) {
+                    i = 0;
+                    appData.readBuffer[0] = 0x73;
+                    len = sprintf(dataOut, "\n\n\n Waiting for data request...\r\n");
+                } else if (i == 1) {
+                    len = sprintf(dataOut, "\n\n Accelerometer data at 100Hz for 1 sec\r\n%d %d %d %d %d %d %d\r\n", i, data[5], data[6], data[7], data[2], data[3], data[4]);
+                    i++;
+                } else {
+                    i++;
+                }
+                
             } else {
-                i++;
+                len = 1;
+                dataOut[0] = 0;
             }
-            
-            
+
+
             /* read register order:
              * 1 temp
              * 2 gyro X
