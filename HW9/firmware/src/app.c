@@ -449,9 +449,9 @@ void APP_Tasks(void) {
                 if (i > 100) {
                     i = 0;
                     appData.readBuffer[0] = 0x73;
-                    len = sprintf(dataOut, "\n\n\n Waiting for data request...\r\n");
+                    len = sprintf(dataOut, "\n\n\nWaiting for data request...\r\n");
                 } else if (i == 1) {
-                    len = sprintf(dataOut, "\n\n Accelerometer data at 100Hz for 1 sec\r\n%d %d %d %d %d %d %d\r\n", i, data[5], data[6], data[7], data[2], data[3], data[4]);
+                    len = sprintf(dataOut, "\n\nAccelerometer data at 100Hz for 1 sec\r\n%d %d %d %d %d %d %d\r\n", i, data[5], data[6], data[7], data[2], data[3], data[4]);
                     i++;
                 } else {
                     i++;
