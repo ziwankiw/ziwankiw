@@ -65,6 +65,12 @@ uint8_t APP_MAKE_BUFFER_DMA_READY readBuffer[APP_READ_BUFFER_SIZE];
 int len, i = 0;
 int startTime = 0;
 
+//initialize MAF variables
+#define MAFlength 4
+int iMAF = 0;
+int MAFbuf[MAFlength];
+
+
 // *****************************************************************************
 /* Application Data
   Summary:
@@ -337,6 +343,8 @@ void APP_Initialize(void) {
     initAccel();
 
     startTime = _CP0_GET_COUNT();
+
+
 }
 
 /******************************************************************************
@@ -349,12 +357,10 @@ void APP_Initialize(void) {
 void APP_Tasks(void) {
     /* Update the application state machine based
      * on the current state */
-
     int length = 14;
     char msg[100];
     unsigned char bytes[length];
     short data[length / 2];
-
 
     switch (appData.state) {
         case APP_STATE_INIT:
@@ -444,19 +450,41 @@ void APP_Tasks(void) {
                 I2C_read_multiple(ADDR, 0x20, bytes, length);
                 reconstructShort(bytes, data, length);
 
-                len = sprintf(dataOut, "%d %d %d %d %d %d %d\r\n", i, data[5], data[6], data[7], data[2], data[3], data[4]);
+                //MAF code
+                MAFbuf[iMAF] = data[7];
+
+                if (iMAF < MAFlength-1) {
+                    iMAF++;
+                } else {
+                    iMAF = 0;
+                }
+
+                int sum = 0;
+                int j;
+
+                for (j = 0; j < MAFlength; j++) {
+                    sum = sum + MAFbuf[j];
+                }
+                int MAF_AVG = sum / MAFlength;
+                //end MAF code
+
+
+                len = sprintf(dataOut, "%d\t%d\t%d\r\n", i, data[7], MAF_AVG);
 
                 if (i > 100) {
                     i = 0;
                     appData.readBuffer[0] = 0x73;
                     len = sprintf(dataOut, "\n\n\nWaiting for data request...\r\n");
+                    int MAFbuf[MAFlength] = {0};
                 } else if (i == 1) {
-                    len = sprintf(dataOut, "\n\nAccelerometer data at 100Hz for 1 sec\r\n%d %d %d %d %d %d %d\r\n", i, data[5], data[6], data[7], data[2], data[3], data[4]);
+                    len = sprintf(dataOut, "\n\nAccelerometer data at 100Hz for 1 sec\r\n"
+                            "Index\tRaw\tMAF\tIIR\tFIR\r\n"
+                            "%d\t%d\t%d\r\n", i, data[7], MAF_AVG);
                     i++;
                 } else {
                     i++;
                 }
-                
+
             } else {
                 len = 1;
                 dataOut[0] = 0;
