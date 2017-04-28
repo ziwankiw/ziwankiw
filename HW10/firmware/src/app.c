@@ -70,6 +70,12 @@ int startTime = 0;
 int iMAF = 0;
 int MAFbuf[MAFlength];
 
+//initialize IIR variables
+#define b  0.1 //new value weight
+#define a  (1.0 - b) //noise weight
+int prev_val = 0;
+
+
 
 // *****************************************************************************
 /* Application Data
@@ -450,7 +456,10 @@ void APP_Tasks(void) {
                 I2C_read_multiple(ADDR, 0x20, bytes, length);
                 reconstructShort(bytes, data, length);
 
+                ///////////////////
+                
                 //MAF code
+                
                 MAFbuf[iMAF] = data[7];
 
                 if (iMAF < MAFlength-1) {
@@ -467,19 +476,30 @@ void APP_Tasks(void) {
                 }
                 int MAF_AVG = sum / MAFlength;
                 //end MAF code
+                
+                ///////////////////
+                
+                //IIR code
+                int new_val = data[7];
+                
+                int IIR_AVG = a*((float) prev_val) + b*((float) new_val);
+                
+                prev_val = IIR_AVG;
+                //end IIR code
+                
+                ///////////////////
 
 
-                len = sprintf(dataOut, "%d\t%d\t%d\r\n", i, data[7], MAF_AVG);
+                len = sprintf(dataOut, "%d\t%d\t%d\t%d\r\n", i, data[7], MAF_AVG, IIR_AVG);
 
                 if (i > 100) {
                     i = 0;
                     appData.readBuffer[0] = 0x73;
                     len = sprintf(dataOut, "\n\n\nWaiting for data request...\r\n");
-                    int MAFbuf[MAFlength] = {0};
                 } else if (i == 1) {
                     len = sprintf(dataOut, "\n\nAccelerometer data at 100Hz for 1 sec\r\n"
                             "Index\tRaw\tMAF\tIIR\tFIR\r\n"
-                            "%d\t%d\t%d\r\n", i, data[7], MAF_AVG);
+                            "%d\t%d\t%d\t%d\r\n", i, data[7], MAF_AVG, IIR_AVG);
                     i++;
                 } else {
                     i++;
