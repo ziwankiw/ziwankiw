@@ -75,6 +75,15 @@ int MAFbuf[MAFlength];
 #define a  (1.0 - b) //noise weight
 int prev_val = 0;
 
+//initialize FIR variables
+#define c1 0.0246
+#define c2 0.2344
+#define c3 0.4821
+#define c4 0.2344
+#define FIRlength 4
+float C[FIRlength] = {c1, c2, c3, c4};
+int iFIR = 0;
+int FIRbuf[FIRlength];
 
 
 // *****************************************************************************
@@ -457,7 +466,6 @@ void APP_Tasks(void) {
                 reconstructShort(bytes, data, length);
 
                 ///////////////////
-                
                 //MAF code
                 
                 MAFbuf[iMAF] = data[7];
@@ -488,9 +496,33 @@ void APP_Tasks(void) {
                 //end IIR code
                 
                 ///////////////////
+                
+                // FIR code
+                int k;
+                int FIRval = 0;
+                int temp[FIRlength];
+                for (k=0; k<FIRlength-1; k++) {
+                    temp[k] = FIRbuf[k+1];
+                    //temp[k] = k;
+                }
+                
+                FIRbuf[FIRlength-1] = data[7];
+                
+                for (k=0; k<FIRlength; k++) {
+                    if (k<FIRlength - 1){
+                       FIRbuf[k] = temp[k]; 
+                    }
+                    
+                    //FIRval = FIRval + 100;
+                    FIRval = FIRval +  (C[k] * ((float) FIRbuf[k]));
+                    
+                }
+                                
+                //end FIR code
+                ///////////////////
 
 
-                len = sprintf(dataOut, "%d\t%d\t%d\t%d\r\n", i, data[7], MAF_AVG, IIR_AVG);
+                len = sprintf(dataOut, "%d\t%d\t%d\t%d\t%d\r\n", i, data[7], MAF_AVG, IIR_AVG, FIRval);
 
                 if (i > 100) {
                     i = 0;
@@ -499,7 +531,7 @@ void APP_Tasks(void) {
                 } else if (i == 1) {
                     len = sprintf(dataOut, "\n\nAccelerometer data at 100Hz for 1 sec\r\n"
                             "Index\tRaw\tMAF\tIIR\tFIR\r\n"
-                            "%d\t%d\t%d\t%d\r\n", i, data[7], MAF_AVG, IIR_AVG);
+                            "%d\t%d\t%d\t%d\t%d\r\n", i, data[7], MAF_AVG, IIR_AVG, FIRval);
                     i++;
                 } else {
                     i++;
