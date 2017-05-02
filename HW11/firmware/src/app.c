@@ -255,7 +255,7 @@ void APP_Initialize(void) {
     //appData.emulateMouse = true;
     appData.hidInstance = 0;
     appData.isMouseReportSendBusy = false;
-    
+
     i2c_master_setup();
     initAccel();
 }
@@ -269,6 +269,11 @@ void APP_Initialize(void) {
 
 void APP_Tasks(void) {
 
+    int length = 14;
+    char msg[100];
+    unsigned char bytes[length];
+    short data[length / 2];
+    
     /* Check the application's current state. */
     switch (appData.state) {
             /* Application's initial state. */
@@ -303,14 +308,28 @@ void APP_Tasks(void) {
             break;
 
         case APP_STATE_MOUSE_EMULATE:
-
+            ;
+            static int inc = 0;
             // every 50th loop, or 20 times per second
 
             appData.mouseButton[0] = MOUSE_BUTTON_STATE_RELEASED;
             appData.mouseButton[1] = MOUSE_BUTTON_STATE_RELEASED;
-            appData.xCoordinate = (int8_t) 2; //dir_table[vector & 0x07];
-            appData.yCoordinate = (int8_t) 2; //dir_table[(vector + 2) & 0x07];
-                        
+
+            if (inc < 4) {
+                appData.xCoordinate = (int8_t) 0; //dir_table[vector & 0x07];
+                appData.yCoordinate = (int8_t) 0; //dir_table[(vector + 2) & 0x07];
+                inc++;
+            } else {
+                I2C_read_multiple(ADDR, 0x20, bytes, length);
+                reconstructShort(bytes, data, length);
+                
+                float divider = 2000.0;
+                
+                appData.xCoordinate = (int8_t) ((float) data[5] / divider); //dir_table[vector & 0x07];
+                appData.yCoordinate = (int8_t) ((float) data[6] / divider); //dir_table[(vector + 2) & 0x07];
+                inc = 0;
+            }
+
 
             if (!appData.isMouseReportSendBusy) {
                 /* This means we can send the mouse report. The

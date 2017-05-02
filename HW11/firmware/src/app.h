@@ -53,6 +53,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 #include "mouse.h"
+#include "i2c_master_noint.h"
+#include "accel.h"
 
 // *****************************************************************************
 // *****************************************************************************
