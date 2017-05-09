@@ -106,7 +106,7 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
 
 
             // in the row, see if there is more green than red
-            for (int startY = 0; startY < bmp.getHeight(); startY++) {
+            for (int startY = 0; startY < bmp.getHeight(); startY = startY + 5) {
                 bmp.getPixels(pixels, 0, bmp.getWidth(), 0, startY, bmp.getWidth(), 1);
 
                 for (int i = 0; i < bmp.getWidth(); i++) {
