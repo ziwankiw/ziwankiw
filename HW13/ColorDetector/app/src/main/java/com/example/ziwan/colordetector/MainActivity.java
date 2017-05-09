@@ -99,8 +99,9 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
         mTextureView.getBitmap(bmp);
 
         final Canvas c = mSurfaceHolder.lockCanvas();
+        int thresh = 0; // comparison value
         if (c != null) {
-            int thresh = 0; // comparison value
+
             int[] pixels = new int[bmp.getWidth()]; // pixels[] is the RGBA data
             // int startY = 1; // which row in the bitmap to analyze to read
 
@@ -125,8 +126,8 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
         int pos = 50;
         canvas.drawCircle(pos, 240, 5, paint1); // x position, y position, diameter, color
 
-        // write the pos as text
-        canvas.drawText("pos = " + pos, 10, 200, paint1);
+        // write the threshold as text
+        canvas.drawText("thresh = " + thresh, 10, 200, paint1);
         c.drawBitmap(bmp, 0, 0, null);
         mSurfaceHolder.unlockCanvasAndPost(c);
 
