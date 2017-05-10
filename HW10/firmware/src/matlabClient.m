@@ -1,0 +1,74 @@
+function matlabClient(port)
+%   provides a menu for accessing PIC32 motor control functions
+%
+%   client(port)
+%
+%   Input Arguments:
+%       port - the name of the com port.  This should be the same as what
+%               you use in screen or putty in quotes ' '
+%
+%   Example:
+%       client('/dev/ttyUSB0') (Linux/Mac)
+%       client('COM3') (PC)
+%
+%   For convenience, you may want to change this so that the port is hardcoded.
+   
+% Opening COM connection
+if ~isempty(instrfind)
+    fclose(instrfind);
+    delete(instrfind);
+end
+
+fprintf('Opening port %s....\n',port);
+
+% settings for opening the serial port. baud rate 230400, hardware flow control
+% wait up to 120 seconds for data before timing out
+mySerial = serial(port, 'BaudRate', 230400, 'Timeout',15); 
+% opens serial connection
+fopen(mySerial);
+% closes serial port when function exits
+clean = onCleanup(@()fclose(mySerial));     
+N = 100;
+data = zeros(N-1,5);
+
+has_quit = false;
+% menu loop
+while ~has_quit
+    fprintf('PIC32 MOTOR DRIVER INTERFACE\n\n');
+    
+    % read the user's choice
+    selection = input('ENTER COMMAND: ', 's');
+     
+    % send the command to the PIC32
+    fprintf(mySerial,'%c\n',selection);
+    
+    % take the appropriate action
+    switch selection
+        
+        case 'r'  %Return current PIC mode
+            
+            fprintf('Executing...\n');
+            junk = fscanf(mySerial,'%d');
+            for ii = 1:N-1
+                data(ii,:) = fscanf(mySerial,'%d %d %d %d %d');
+%                 index(ii) = fscanf(mySerial,'%d'); %receive test data from PIC
+%                 raw(ii) = fscanf(mySerial,'%d');
+%                 maf(ii) = fscanf(mySerial,'%d');
+%                 iir(ii) = fscanf(mySerial,'%d');
+%                 fir(ii) = fscanf(mySerial,'%d');
+            end
+            save('data.mat','data');
+            close all
+            
+            plot(data(:,2:end)/2^14)
+            legend('raw','MAF','IIR','FIR')
+            
+            
+            has_quit = true;             % exit client
+            
+        otherwise
+            fprintf('Invalid Selection %c\n', selection);
+    end
+end
+
+end

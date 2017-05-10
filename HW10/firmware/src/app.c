@@ -51,8 +51,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "app.h"
 #include "accel.h"
 #include "i2c_master_noint.h"
-#include <stdio.h>
+
 #include <xc.h>
+#include <stdio.h>
 
 // *****************************************************************************
 // *****************************************************************************
@@ -459,18 +460,17 @@ void APP_Tasks(void) {
             appData.isWriteComplete = false;
             appData.state = APP_STATE_WAIT_FOR_WRITE_COMPLETE;
 
-            if (appData.readBuffer[0] == 0x72) { // ascii r
-
+            if (appData.readBuffer[0] == 0x72) {
 
                 I2C_read_multiple(ADDR, 0x20, bytes, length);
                 reconstructShort(bytes, data, length);
 
                 ///////////////////
                 //MAF code
-                
+
                 MAFbuf[iMAF] = data[7];
 
-                if (iMAF < MAFlength-1) {
+                if (iMAF < MAFlength - 1) {
                     iMAF++;
                 } else {
                     iMAF = 0;
@@ -484,55 +484,63 @@ void APP_Tasks(void) {
                 }
                 int MAF_AVG = sum / MAFlength;
                 //end MAF code
-                
+
                 ///////////////////
-                
+
                 //IIR code
                 int new_val = data[7];
-                
-                int IIR_AVG = a*((float) prev_val) + b*((float) new_val);
-                
+
+                int IIR_AVG = a * ((float) prev_val) + b * ((float) new_val);
+
                 prev_val = IIR_AVG;
                 //end IIR code
-                
+
                 ///////////////////
-                
+
                 // FIR code
                 int k;
                 int FIRval = 0;
                 int temp[FIRlength];
-                for (k=0; k<FIRlength-1; k++) {
-                    temp[k] = FIRbuf[k+1];
+                for (k = 0; k < FIRlength - 1; k++) {
+                    temp[k] = FIRbuf[k + 1];
                     //temp[k] = k;
                 }
-                
-                FIRbuf[FIRlength-1] = data[7];
-                
-                for (k=0; k<FIRlength; k++) {
-                    if (k<FIRlength - 1){
-                       FIRbuf[k] = temp[k]; 
+
+                FIRbuf[FIRlength - 1] = data[7];
+
+                for (k = 0; k < FIRlength; k++) {
+                    if (k < FIRlength - 1) {
+                        FIRbuf[k] = temp[k];
                     }
-                    
+
                     //FIRval = FIRval + 100;
-                    FIRval = FIRval +  (C[k] * ((float) FIRbuf[k]));
-                    
+                    FIRval = FIRval + (C[k] * ((float) FIRbuf[k]));
+
                 }
-                                
+             
                 //end FIR code
                 ///////////////////
 
 
-                len = sprintf(dataOut, "%d\t%d\t%d\t%d\t%d\r\n", i, data[7], MAF_AVG, IIR_AVG, FIRval);
+                len = sprintf(dataOut, "%d %d %d %d %d\r\n", i, data[7], MAF_AVG, IIR_AVG, FIRval);
+                //len = sprintf(dataOut, "%d\t %d\r\n", i, data[7]);
 
                 if (i > 100) {
                     i = 0;
                     appData.readBuffer[0] = 0x73;
-                    len = sprintf(dataOut, "\n\n\nWaiting for data request...\r\n");
-                } else if (i == 1) {
+                    len = 1;
+                    dataOut[0] = 0;
+                    //len = sprintf(dataOut, "\n\n\nWaiting for data request...\r\n");
+                /*} else if (i == 1) {
+                    //len = sprintf(dataOut, "\n\nAccelerometer data at 100Hz for 1 sec\r\n"
+                    //        "Index\t Raw\t MAF\t IIR\t FIR\r\n"
+                    //        "%d\t %d\t %d\t %d\t %d\r\n", i, data[7], MAF_AVG, IIR_AVG, FIRval);
                     len = sprintf(dataOut, "\n\nAccelerometer data at 100Hz for 1 sec\r\n"
-                            "Index\tRaw\tMAF\tIIR\tFIR\r\n"
-                            "%d\t%d\t%d\t%d\t%d\r\n", i, data[7], MAF_AVG, IIR_AVG, FIRval);
+                            "Index\t Raw\t MAF\t IIR\t FIR\r\n"
+                            "%d\t%d\r\n", i, data[7]);
+                    
                     i++;
+                 * */
                 } else {
                     i++;
                 }
