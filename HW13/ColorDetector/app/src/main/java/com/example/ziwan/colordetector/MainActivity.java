@@ -27,6 +27,7 @@ import static android.graphics.Color.blue;
 import static android.graphics.Color.green;
 import static android.graphics.Color.red;
 import static android.graphics.Color.rgb;
+import static java.lang.Math.abs;
 
 public class MainActivity extends Activity implements TextureView.SurfaceTextureListener {
     private Camera mCamera;
@@ -138,8 +139,11 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
                 bmp.getPixels(pixels, 0, bmp.getWidth(), 0, startY, bmp.getWidth(), 1);
 
                 for (int i = 0; i < bmp.getWidth(); i++) {
-                    if ((green(pixels[i]) - red(pixels[i])) > thresh && (green(pixels[i]) - blue(pixels[i])) > thresh) {
-                        pixels[i] = rgb(0, 255, 0); // over write the pixel with pure green
+                    /*if ((green(pixels[i]) - red(pixels[i])) > thresh && (green(pixels[i]) - blue(pixels[i])) > thresh) {
+                        pixels[i] = rgb(255, 255, 255); // over write the pixel with white
+                    }*/
+                    if (abs(green(pixels[i])-red(pixels[i]))<thresh && abs(blue(pixels[i])-green(pixels[i]))<thresh && abs(red(pixels[i])-blue(pixels[i]))<thresh) {
+                        pixels[i] = rgb(255, 255, 255); // over write the pixel with white
                     }
                 }
                 // update the row
