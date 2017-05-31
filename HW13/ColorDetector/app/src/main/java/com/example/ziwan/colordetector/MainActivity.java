@@ -28,6 +28,7 @@ import static android.graphics.Color.green;
 import static android.graphics.Color.red;
 import static android.graphics.Color.rgb;
 import static java.lang.Math.abs;
+import static java.lang.Math.round;
 
 public class MainActivity extends Activity implements TextureView.SurfaceTextureListener {
     private Camera mCamera;
@@ -135,32 +136,54 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
 
 
             // in the row, see if there is more green than red
-            for (int startY = 0; startY < bmp.getHeight(); startY = startY + 5) {
-                bmp.getPixels(pixels, 0, bmp.getWidth(), 0, startY, bmp.getWidth(), 1);
+            //for (int startY = 0; startY < bmp.getHeight(); startY = startY + 5) {
+            int startY = bmp.getHeight() / 2;
+            bmp.getPixels(pixels, 0, bmp.getWidth(), 0, startY, bmp.getWidth(), 1);
 
-                for (int i = 0; i < bmp.getWidth(); i++) {
+            int CoM = 0;
+            int mr = 0;
+            int n = 1;
+
+            for (int i = 0; i < bmp.getWidth(); i++) {
                     /*if ((green(pixels[i]) - red(pixels[i])) > thresh && (green(pixels[i]) - blue(pixels[i])) > thresh) {
                         pixels[i] = rgb(255, 255, 255); // over write the pixel with white
                     }*/
-                    if (abs(green(pixels[i])-red(pixels[i]))<thresh && abs(blue(pixels[i])-green(pixels[i]))<thresh && abs(red(pixels[i])-blue(pixels[i]))<thresh) {
-                        pixels[i] = rgb(255, 255, 255); // over write the pixel with white
-                    }
+                if (abs(green(pixels[i]) - red(pixels[i])) < thresh && abs(blue(pixels[i]) - green(pixels[i])) < thresh && abs(red(pixels[i]) - blue(pixels[i])) < thresh) {
+                    pixels[i] = rgb(255, 255, 255); // over write the pixel with white
+                    mr = mr + i;
+                    n++;
                 }
-                // update the row
-                bmp.setPixels(pixels, 0, bmp.getWidth(), 0, startY, bmp.getWidth(), 1);
             }
+            // update the row
+            bmp.setPixels(pixels, 0, bmp.getWidth(), 0, startY, bmp.getWidth(), 1);
+
+            if (n>0 && mr>0) {
+                CoM = mr/n;
+            } else {
+                CoM = bmp.getWidth()/2;
+            }
+            // draw a circle at Center of mass
+
+            int pos = round(CoM);
+            canvas.drawCircle(pos, 240, 5, paint1); // x position, y position, diameter, color
+
+            /*// write the COM position
+            canvas.drawText("CoM = " + round(CoM), 10, 350, paint1);
+            //canvas.drawText("thresh = " + thresh, 10, 200, paint1);
+            c.drawBitmap(bmp, 0, 0, null);
+            mSurfaceHolder.unlockCanvasAndPost(c);*/
+
 
 
         }
 
         setMyControlListener();
 
-        // draw a circle at some position
-        int pos = 50;
-        canvas.drawCircle(pos, 240, 5, paint1); // x position, y position, diameter, color
+
 
         // write the threshold as text
         canvas.drawText("thresh = " + thresh, 10, 200, paint1);
+        //canvas.drawText("thresh = " + thresh, 10, 200, paint1);
         c.drawBitmap(bmp, 0, 0, null);
         mSurfaceHolder.unlockCanvasAndPost(c);
 
