@@ -26,15 +26,15 @@
 
         <SurfaceView
             android:id="@+id/surfaceview"
-            android:layout_width="278dp"
+            android:layout_width="339dp"
             android:layout_height="185dp"
-            android:layout_weight="0.23" />
+            android:layout_weight="0.13" />
 
         <TextureView
             android:id="@+id/textureview"
-            android:layout_width="278dp"
+            android:layout_width="340dp"
             android:layout_height="155dp"
-            android:layout_weight="0.22" />
+            android:layout_weight="0.34" />
 
         <SeekBar
             android:id="@+id/seek1"
