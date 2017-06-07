@@ -1,6 +1,5 @@
-package com.example.ziwan.techcup2017;
+package com.example.ziwan.techcup;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -15,22 +14,6 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
-import android.Manifest;
-
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.SurfaceTexture;
-import android.hardware.Camera;
-import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.TextureView;
-import android.view.WindowManager;
-
 import com.hoho.android.usbserial.driver.CdcAcmSerialDriver;
 import com.hoho.android.usbserial.driver.ProbeTable;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
@@ -44,6 +27,26 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.SurfaceTexture;
+import android.hardware.Camera;
+import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.TextureView;
+import android.view.WindowManager;
+import android.widget.TextView;
+import android.widget.SeekBar;
+
+import java.io.IOException;
+
 import static android.graphics.Color.blue;
 import static android.graphics.Color.green;
 import static android.graphics.Color.red;
@@ -54,6 +57,7 @@ import static java.lang.Math.round;
 public class MainActivity extends Activity implements TextureView.SurfaceTextureListener {
     SeekBar myControl;
     TextView myTextView;
+
     Button button;
     TextView myTextView2;
     ScrollView myScrollView;
@@ -72,7 +76,6 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
     private Canvas canvas = new Canvas(bmp);
     private Paint paint1 = new Paint();
     private TextView mTextView;
-    SeekBar threshControl;
     int thresh;
 
     static long prevtime = 0; // for FPS calculation
@@ -83,8 +86,20 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); // keeps the screen from turning off
 
+        mTextView = (TextView) findViewById(R.id.cameraStatus);
+
+        myControl = (SeekBar) findViewById(R.id.seek1);
+
+        myTextView = (TextView) findViewById(R.id.textView01);
+        myTextView.setText("Enter whatever you Like!");
+
+        myTextView2 = (TextView) findViewById(R.id.textView02);
+        myScrollView = (ScrollView) findViewById(R.id.ScrollView01);
+        myTextView3 = (TextView) findViewById(R.id.textView03);
+        button = (Button) findViewById(R.id.button1);
+
         // see if the app has permission to use the camera
-        //ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA}, 1);
+        // ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA}, 1);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             mSurfaceView = (SurfaceView) findViewById(R.id.surfaceview);
             mSurfaceHolder = mSurfaceView.getHolder();
@@ -101,27 +116,20 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
             mTextView.setText("no camera permissions");
         }
 
-        myControl = (SeekBar) findViewById(R.id.seek1);
-
-        myTextView = (TextView) findViewById(R.id.textView01);
-        myTextView.setText("Enter whatever you Like!");
-        myTextView2 = (TextView) findViewById(R.id.textView02);
-        myScrollView = (ScrollView) findViewById(R.id.ScrollView01);
-        myTextView3 = (TextView) findViewById(R.id.textView03);
-        button = (Button) findViewById(R.id.button1);
-
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 myTextView2.setText("value on click is "+myControl.getProgress());
+
                 String sendString = String.valueOf(myControl.getProgress()) + '\n';
                 try {
                     sPort.write(sendString.getBytes(), 10); // 10 is the timeout
                 } catch (IOException e) { }
             }
+
         });
 
-        //setMyControlListener();
+        setMyControlListener();
         manager = (UsbManager) getSystemService(Context.USB_SERVICE);
     }
 
@@ -133,6 +141,7 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 progressChanged = progress;
+                thresh = progress;
                 myTextView.setText("The value is: "+progress);
             }
 
@@ -146,6 +155,7 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
             }
         });
     }
+
     private final SerialInputOutputManager.Listener mListener =
             new SerialInputOutputManager.Listener() {
                 @Override
@@ -289,62 +299,57 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
         mTextureView.getBitmap(bmp);
 
         final Canvas c = mSurfaceHolder.lockCanvas();
-        //int thresh = 0; // comparison value
-        if (c != null) {
 
+        int CoM = 0;
+        int mr = 0;
+        int n = 1;
+
+        if (c != null) {
+            //int thresh = 0; // comparison value
             int[] pixels = new int[bmp.getWidth()]; // pixels[] is the RGBA data
-            // int startY = 1; // which row in the bitmap to analyze to read
+            int startY = bmp.getHeight()/2; // which row in the bitmap to analyze to read
+            bmp.getPixels(pixels, 0, bmp.getWidth(), 0, startY, bmp.getWidth(), 1);
+
 
 
             // in the row, see if there is more green than red
-            //for (int startY = 0; startY < bmp.getHeight(); startY = startY + 5) {
-            int startY = bmp.getHeight() / 2;
-            bmp.getPixels(pixels, 0, bmp.getWidth(), 0, startY, bmp.getWidth(), 1);
-
-            int CoM = 0;
-            int mr = 0;
-            int n = 1;
-
             for (int i = 0; i < bmp.getWidth(); i++) {
-                if ((green(pixels[i]) - red(pixels[i])) > thresh && (green(pixels[i]) - blue(pixels[i])) > thresh) {
-                    pixels[i] = rgb(255, 255, 255); // over write the pixel with white
-                }
-
-                if (abs(green(pixels[i]) - red(pixels[i])) < thresh && abs(blue(pixels[i]) - green(pixels[i])) < thresh && abs(red(pixels[i]) - blue(pixels[i])) < thresh && green(pixels[i]) > 115 && blue(pixels[i]) > 115 && red(pixels[i]) > 115) {
+                /*if ((green(pixels[i]) - red(pixels[i])) > thresh) {
+                    pixels[i] = rgb(0, 255, 0); // over write the pixel with pure green
+                }*/
+                if (abs(green(pixels[i]) - red(pixels[i])) < thresh && abs(blue(pixels[i]) - green(pixels[i])) < thresh && abs(red(pixels[i]) - blue(pixels[i])) < thresh && green(pixels[i])>115 && blue(pixels[i])>115 && red(pixels[i])>115) {
                     pixels[i] = rgb(255, 255, 255); // over write the pixel with white
                     mr = mr + i;
                     n++;
                 }
+
             }
+
             // update the row
             bmp.setPixels(pixels, 0, bmp.getWidth(), 0, startY, bmp.getWidth(), 1);
-
-            if (n > 0 && mr > 0) {
-                CoM = mr / n;
-            } else {
-                CoM = bmp.getWidth() / 2;
-            }
-            // draw a circle at Center of mass
-
-            int pos = round(CoM);
-            canvas.drawCircle(pos, 240, 5, paint1); // x position, y position, diameter, color
-
-//*
-//write the COM position
-            canvas.drawText("CoM = " + round(CoM), 10, 350, paint1);
-            //canvas.drawText("thresh = " + thresh, 10, 200, paint1);
-            c.drawBitmap(bmp, 0, 0, null);
-            mSurfaceHolder.unlockCanvasAndPost(c);
-
-
-
         }
-        setMyControlListener();
 
+        if (n>0 && mr>0) {
+            CoM = mr/n;
+        } else {
+            CoM = bmp.getWidth()/2;
+        }
+        // draw a circle at Center of mass
 
-        // write the threshold as text
-        canvas.drawText("thresh = " + thresh, 10, 200, paint1);
-        //canvas.drawText("thresh = " + thresh, 10, 200, paint1);
+        int pos = round(CoM);
+        canvas.drawCircle(pos, 240, 5, paint1); // x position, y position, diameter, color
+
+        // send CoM position to PIC
+        String sendString = String.valueOf(pos) + '\n';
+        try {
+            sPort.write(sendString.getBytes(), 10); // 10 is the timeout
+        } catch (IOException e) { }
+        /*// draw a circle at some position
+        int pos = 50;
+        canvas.drawCircle(pos, 240, 5, paint1); // x position, y position, diameter, color
+*/
+        // write the pos as text
+        canvas.drawText("CoM = " + pos, 10, 200, paint1);
         c.drawBitmap(bmp, 0, 0, null);
         mSurfaceHolder.unlockCanvasAndPost(c);
 
@@ -353,8 +358,6 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
         long diff = nowtime - prevtime;
         mTextView.setText("FPS " + 1000 / diff);
         prevtime = nowtime;
-
     }
-
-
 }
+

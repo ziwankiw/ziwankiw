@@ -51,6 +51,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "app.h"
 #include <stdio.h>
 #include <xc.h>
+#include <math.h>
 
 // *****************************************************************************
 // *****************************************************************************
@@ -67,6 +68,9 @@ char rx[64]; // the raw data
 int rxPos = 0; // how much data has been stored
 int gotRx = 0; // the flag
 int rxVal = 0; // a place to store the int that was received
+
+double xPos;
+double yPos;
 
 // *****************************************************************************
 /* Application Data
@@ -465,10 +469,31 @@ void APP_Tasks(void) {
             
             // SET MOTOR DIRECTION AND SPEED
             if (gotRx) {
+                int offset = rxVal - 320;
+                
+                if (offset > 0) { //COM is to the right -> slow the right wheel down
+                    LATAbits.LATA1 = 1; // direction
+                    OC1RS = 1200; // left velocity, 100%
+                    
+                    LATBbits.LATB3 = 1; // direction
+                    OC4RS = 1200 - 3*abs(offset); // right wheel slowed down
+                } else {
+                    LATAbits.LATA1 = 1; // direction
+                    OC1RS = 1200 - 3*abs(offset); // left wheel slowed down
+                    
+                    LATBbits.LATB3 = 1; // direction
+                    OC4RS = 1200; // right velocity 100%
+                }
+               
+                /*
+                //left wheel
                 LATAbits.LATA1 = 1; // direction
                 OC1RS = 1200*rxVal/100; // velocity, 50%
+                
+                //right wheel
                 LATBbits.LATB3 = 1; // direction
                 OC4RS = 1200*rxVal/100; // velocity, 50%
+                 */
             }
            
             
