@@ -93,10 +93,10 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
         myTextView = (TextView) findViewById(R.id.textView01);
         myTextView.setText("Enter whatever you Like!");
 
-        myTextView2 = (TextView) findViewById(R.id.textView02);
+        /*myTextView2 = (TextView) findViewById(R.id.textView02);
         myScrollView = (ScrollView) findViewById(R.id.ScrollView01);
         myTextView3 = (TextView) findViewById(R.id.textView03);
-        button = (Button) findViewById(R.id.button1);
+        button = (Button) findViewById(R.id.button1);*/
 
         // see if the app has permission to use the camera
         // ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA}, 1);
@@ -116,7 +116,7 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
             mTextView.setText("no camera permissions");
         }
 
-        button.setOnClickListener(new View.OnClickListener() {
+        /*button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 myTextView2.setText("value on click is "+myControl.getProgress());
@@ -127,7 +127,7 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
                 } catch (IOException e) { }
             }
 
-        });
+        });*/
 
         setMyControlListener();
         manager = (UsbManager) getSystemService(Context.USB_SERVICE);
@@ -259,8 +259,8 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
         String rxString = null;
         try {
             rxString = new String(data, "UTF-8"); // put the data you got into a string
-            myTextView3.append(rxString);
-            myScrollView.fullScroll(View.FOCUS_DOWN);
+            //myTextView3.append(rxString);
+            //myScrollView.fullScroll(View.FOCUS_DOWN);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -317,7 +317,7 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
                 /*if ((green(pixels[i]) - red(pixels[i])) > thresh) {
                     pixels[i] = rgb(0, 255, 0); // over write the pixel with pure green
                 }*/
-                if (abs(green(pixels[i]) - red(pixels[i])) < thresh && abs(blue(pixels[i]) - green(pixels[i])) < thresh && abs(red(pixels[i]) - blue(pixels[i])) < thresh && green(pixels[i])>115 && blue(pixels[i])>115 && red(pixels[i])>115) {
+                if (abs(green(pixels[i]) - red(pixels[i])) < thresh && abs(blue(pixels[i]) - green(pixels[i])) < thresh && abs(red(pixels[i]) - blue(pixels[i])) < thresh && (green(pixels[i]) + blue(pixels[i]) + red(pixels[i]))/3>115 && (green(pixels[i]) + blue(pixels[i]) + red(pixels[i]))/3<200) {
                     pixels[i] = rgb(255, 255, 255); // over write the pixel with white
                     mr = mr + i;
                     n++;

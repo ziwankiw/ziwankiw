@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:text="initial value " />
 
-            <Button
+            <!--<Button
                 android:id="@+id/button1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
                     android:layout_height="wrap_content"
                     android:background="@android:color/holo_green_light"
                     android:text="nothing from usb yet" />
-            </ScrollView>
+            </ScrollView>-->
 
             <TextView
                 android:id="@+id/cameraStatus"

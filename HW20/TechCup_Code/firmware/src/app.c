@@ -72,6 +72,11 @@ int rxVal = 0; // a place to store the int that was received
 double xPos;
 double yPos;
 
+int flagvals[160] = {3500,	3550,	3600,	3650,	3700,	3750,	3800,	3850,	3900,	3950,	4000,	4050,	4100,	4150,	4200,	4250,	4300,	4350,	4400,	4450,	4500,	4550,	4600,	4650,	4700,	4750,	4800,	4850,	4900,	4950,	5000,	5050,	5100,	5150,	5200,	5250,	5300,	5350,	5400,	5450,	5500,	5450,	5400,	5350,	5300,	5250,	5200,	5150,	5100,	5050,	5000,	4950,	4900,	4850,	4800,	4750,	4700,	4650,	4600,	4550,	4500,	4450,	4400,	4350,	4300,	4250,	4200,	4150,	4100,	4050,	4000,	3950,	3900,	3850,	3800,	3750,	3700,	3650,	3600,	3550
+};
+int rccount = 0;
+
+
 // *****************************************************************************
 /* Application Data
   Summary:
@@ -383,6 +388,19 @@ void APP_Initialize(void) {
     IPC4bits.IC4IS = 1; // step 4: interrupt priority 1
     IFS0bits.IC4IF = 0; // step 5: clear the int flag
     IEC0bits.IC4IE = 1; // step 6: enable INT0 by setting IEC0<3>
+    
+    // servo motor initialization
+    RPB8Rbits.RPB8R = 0b0101; //OC2 on B8
+    
+    T3CONbits.TCKPS = 4; // prescaler N=16
+    PR3 = 60000 - 1; // 50Hz
+    TMR3 = 0;
+    OC2CONbits.OCM = 0b110; // PWM mode without fault pin; other OC1CON bits are defaults
+    OC2CONbits.OCTSEL = 1; // use timer3
+    OC2RS = 4500; // should set the motor to 90 degrees (0.5ms to 2.5ms is 1500 to 7500 for 0 to 180 degrees)
+    OC2R = 4500; // read-only
+    T3CONbits.ON = 1;
+    OC2CONbits.ON = 1;
 }
 
 /******************************************************************************
@@ -467,24 +485,55 @@ void APP_Tasks(void) {
                 }
             }
             
+            int maxOC = 600;
+            float kp = 2;
             // SET MOTOR DIRECTION AND SPEED
             if (gotRx) {
                 int offset = rxVal - 320;
-                
+                int adjust = kp * (float) abs(offset);
+
+                if (adjust > maxOC) {
+                    adjust = maxOC;
+                }
+
                 if (offset > 0) { //COM is to the right -> slow the right wheel down
                     LATAbits.LATA1 = 1; // direction
-                    OC1RS = 1200; // left velocity, 100%
-                    
+                    OC1RS = maxOC; // left velocity, 100%
+
                     LATBbits.LATB3 = 1; // direction
-                    OC4RS = 1200 - 3*abs(offset); // right wheel slowed down
-                } else {
+                    OC4RS = maxOC-adjust; // right wheel slowed down
+                } else { //COM is to the left
                     LATAbits.LATA1 = 1; // direction
-                    OC1RS = 1200 - 3*abs(offset); // left wheel slowed down
-                    
+                    OC1RS = maxOC-adjust; // left wheel slowed down
+
                     LATBbits.LATB3 = 1; // direction
-                    OC4RS = 1200; // right velocity 100%
+                    OC4RS = maxOC; // right velocity 100%
                 }
-               
+
+                OC2RS = flagvals[rccount];
+                
+                rccount++;
+                if (rccount >=79) {
+                    rccount = 0;
+                }
+                
+                /*
+                fastcount++;
+
+                if (fastcount > 100) {
+
+                    OC2RS = rcvals[rccount];
+                    rccount++;
+
+                    if (rccount == 3) {
+                        rccount = 0;
+                    }
+
+                    fastcount = 0;
+                }
+*/
+
+                // should set the motor to 90 degrees (0.5ms to 2.5ms is 1500 to 7500 for 0 to 180 degrees)
                 /*
                 //left wheel
                 LATAbits.LATA1 = 1; // direction
@@ -495,8 +544,7 @@ void APP_Tasks(void) {
                 OC4RS = 1200*rxVal/100; // velocity, 50%
                  */
             }
-           
-            
+            //OC2RS = 7500;
 
             break;
 
@@ -530,7 +578,10 @@ void APP_Tasks(void) {
             appData.state = APP_STATE_WAIT_FOR_WRITE_COMPLETE;
 
              if (gotRx) {
-                len = sprintf(dataOut, "got: %d\r\n", rxVal);
+                //len = sprintf(dataOut, "got: %d\r\n", rxVal);
+                 //len = sprintf(dataOut,"xpos = %f, ypos = %f\r\n",xPos,yPos);
+                 dataOut[0];
+                 len=1;
                 i++;
                 USB_DEVICE_CDC_Write(USB_DEVICE_CDC_INDEX_0,
                         &appData.writeTransferHandle,
@@ -539,7 +590,8 @@ void APP_Tasks(void) {
                 rxPos = 0;
                 gotRx = 0;
             } else {
-                len = sprintf(dataOut, "%d\r\n", i);
+                 dataOut[0]=0;
+                len = 1;
                 i++;
                 USB_DEVICE_CDC_Write(USB_DEVICE_CDC_INDEX_0,
                         &appData.writeTransferHandle, dataOut, len,
