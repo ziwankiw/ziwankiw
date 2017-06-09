@@ -317,7 +317,7 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
                 /*if ((green(pixels[i]) - red(pixels[i])) > thresh) {
                     pixels[i] = rgb(0, 255, 0); // over write the pixel with pure green
                 }*/
-                if (abs(green(pixels[i]) - red(pixels[i])) < thresh && abs(blue(pixels[i]) - green(pixels[i])) < thresh && abs(red(pixels[i]) - blue(pixels[i])) < thresh && (green(pixels[i]) + blue(pixels[i]) + red(pixels[i]))/3>115 && (green(pixels[i]) + blue(pixels[i]) + red(pixels[i]))/3<200) {
+                if (abs(green(pixels[i]) - red(pixels[i])) < thresh && abs(blue(pixels[i]) - green(pixels[i])) < thresh && abs(red(pixels[i]) - blue(pixels[i])) < thresh && (green(pixels[i]) + blue(pixels[i]) + red(pixels[i]))/3>115 && (green(pixels[i]) + blue(pixels[i]) + red(pixels[i]))/3<175) {
                     pixels[i] = rgb(255, 255, 255); // over write the pixel with white
                     mr = mr + i;
                     n++;
